@@ -533,12 +533,13 @@
     const currentDateLabel = document.getElementById('currentDateLabel');
     const skeletonContainer = document.getElementById('skeletonContainer');
 
+    // === ИСПРАВЛЕННОЕ ВРЕМЯ ПАР ===
     const pairTimes = {
-      1: '08:00–09:00',
-      2: '09:10–10:10',
-      3: '10:30–11:30',
-      4: '11:40–12:40',
-      5: '12:50–13:50'
+      1: '08:00–09:30',
+      2: '09:50–11:20',
+      3: '11:50–13:20',
+      4: '13:40–15:00',
+      5: '15:10–16:40'
     };
 
     function formatDate(dateStr) {
@@ -568,11 +569,11 @@
       const now = new Date();
       const totalMinutes = now.getHours() * 60 + now.getMinutes();
       const ranges = [
-        { pair: 1, start: 8 * 60, end: 9 * 60 },
-        { pair: 2, start: 9 * 60 + 10, end: 10 * 60 + 10 },
-        { pair: 3, start: 10 * 60 + 30, end: 11 * 60 + 30 },
-        { pair: 4, start: 11 * 60 + 40, end: 12 * 60 + 40 },
-        { pair: 5, start: 12 * 60 + 50, end: 13 * 60 + 50 },
+        { pair: 1, start: 8 * 60, end: 9 * 60 + 30 },
+        { pair: 2, start: 9 * 60 + 50, end: 11 * 60 + 20 },
+        { pair: 3, start: 11 * 60 + 50, end: 13 * 60 + 20 },
+        { pair: 4, start: 13 * 60 + 40, end: 15 * 60 },
+        { pair: 5, start: 15 * 60 + 10, end: 16 * 60 + 40 },
       ];
       for (const p of ranges) {
         if (totalMinutes >= p.start && totalMinutes < p.end) return p.pair;
@@ -627,7 +628,6 @@
           const auditoriums = [...new Set(items.map(it => it.auditorium))];
           const territories = [...new Set(items.map(it => it.territory))];
 
-          // таблица
           tableHtml += `
             <div class="${rowClass}">
               <span class="pair-num">${pairNum}</span>
@@ -639,7 +639,6 @@
               <span class="territory">${territories.join(' / ')}</span>
             </div>`;
 
-          // карточки
           cardsHtml += `
             <div class="${cardClass}">
               <div class="card-top">

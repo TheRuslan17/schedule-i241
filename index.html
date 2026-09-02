@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>И-24-1 · расписание</title>
+  <style>
+    /* ——— базовые стили ——— */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f2f5f9;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    .card {
+      max-width: 920px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 40px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04), 0 4px 10px rgba(0, 0, 0, 0.02);
+      padding: 2rem 1.8rem;
+      transition: 0.2s;
+    }
+
+    /* шапка */
+    .head {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+      border-bottom: 1px solid #eef2f6;
+      padding-bottom: 1.2rem;
+    }
+
+    .head h1 {
+      font-weight: 500;
+      font-size: 1.9rem;
+      letter-spacing: -0.02em;
+      color: #0b1a2a;
+    }
+
+    .head h1 span {
+      font-weight: 350;
+      color: #4b5d73;
+      font-size: 1.2rem;
+      margin-left: 0.3rem;
+    }
+
+    /* навигация по дням */
+    .day-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.8rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+      min-height: 2.8rem;
+    }
+
+    .day-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 60px;
+      padding: 0.35rem 1.4rem;
+      font-size: 0.9rem;
+      font-weight: 450;
+      color: #2c3d53;
+      cursor: pointer;
+      transition: 0.12s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .day-btn:hover {
+      background: #f1f5fa;
+      border-color: #c8d2e0;
+    }
+
+    .day-btn.active {
+      background: #1e2a3a;
+      border-color: #1e2a3a;
+      color: white;
+    }
+
+    .day-label {
+      font-size: 0.9rem;
+      color: #4d637b;
+      margin-left: 0.25rem;
+      font-weight: 400;
+    }
+
+    /* ——— скелетон (skeleton) ——— */
+    .skeleton {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .skeleton-header {
+      display: grid;
+      grid-template-columns: 60px 80px 70px 1fr 1.1fr 80px 70px;
+      gap: 0.3rem 0.6rem;
+      padding: 0.4rem 0.6rem 0.7rem 0.6rem;
+      border-radius: 20px;
+      margin-bottom: 0.2rem;
+    }
+
+    .skeleton-row {
+      display: grid;
+      grid-template-columns: 60px 80px 70px 1fr 1.1fr 80px 70px;
+      gap: 0.3rem 0.6rem;
+      padding: 0.6rem 0.6rem;
+      border-radius: 18px;
+      background: white;
+      border: 1px solid #f0f4fa;
+    }
+
+    .skeleton-shimmer {
+      height: 1.1rem;
+      border-radius: 8px;
+      background: linear-gradient(
+        90deg,
+        #f0f3f8 25%,
+        #e6ebf2 50%,
+        #f0f3f8 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    .skeleton-shimmer.short { width: 50px; }
+    .skeleton-shimmer.medium { width: 70px; }
+    .skeleton-shimmer.long { width: 100%; }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ——— АНИМАЦИЯ ПРИ ПЕРЕКЛЮЧЕНИИ ДНЕЙ ——— */
+    .schedule {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .schedule-content {
+      animation: slideFadeIn 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+
+    @keyframes slideFadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ——— реальные данные ——— */
+    .row-header {
+      display: grid;
+      grid-template-columns: 60px 80px 70px 1fr 1.1fr 80px 70px;
+      gap: 0.3rem 0.6rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #6f7f94;
+      padding: 0.4rem 0.6rem 0.7rem 0.6rem;
+      border-bottom: 1px solid #eaedf2;
+      background: #fafcfe;
+      border-radius: 20px;
+      margin-bottom: 0.2rem;
+      font-weight: 500;
+    }
+
+    .row-header span:last-child {
+      text-align: right;
+    }
+
+    .row-item {
+      display: grid;
+      grid-template-columns: 60px 80px 70px 1fr 1.1fr 80px 70px;
+      gap: 0.3rem 0.6rem;
+      align-items: center;
+      background: white;
+      padding: 0.6rem 0.6rem;
+      border-radius: 18px;
+      border: 1px solid #f0f4fa;
+      transition: 0.08s;
+      font-size: 0.92rem;
+      line-height: 1.3;
+    }
+
+    .row-item:hover {
+      background: #f8faff;
+      border-color: #dce4ef;
+    }
+
+    .row-item.current-pair {
+      border-color: #4a7aff;
+      background: rgba(74, 122, 255, 0.08);
+      box-shadow: 0 0 0 2px rgba(74, 122, 255, 0.15);
+    }
+
+    .pair-num {
+      font-weight: 480;
+      color: #142433;
+      background: #f0f4fc;
+      border-radius: 40px;
+      text-align: center;
+      padding: 0.1rem 0;
+      font-size: 0.8rem;
+      width: 50px;
+    }
+
+    .pair-time {
+      font-size: 0.75rem;
+      color: #4d637b;
+      text-align: center;
+      font-weight: 450;
+      white-space: nowrap;
+    }
+
+    .subgroup {
+      font-size: 0.75rem;
+      background: #eef3fa;
+      border-radius: 30px;
+      text-align: center;
+      padding: 0.1rem 0.2rem;
+      color: #2e405b;
+      font-weight: 450;
+      min-width: 30px;
+    }
+
+    .subgroup.empty {
+      background: transparent;
+      color: #a5b7cd;
+    }
+
+    .discipline {
+      font-weight: 470;
+      color: #0a1c2e;
+      word-break: break-word;
+    }
+
+    .teacher {
+      color: #1b3147;
+      font-size: 0.88rem;
+    }
+
+    .auditorium {
+      background: #eef3fa;
+      padding: 0.1rem 0.5rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      color: #1f364d;
+      text-align: center;
+      width: fit-content;
+      min-width: 56px;
+      font-weight: 450;
+    }
+
+    .territory {
+      font-size: 0.78rem;
+      color: #4a637e;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .empty-message {
+      padding: 2.2rem 0.5rem;
+      text-align: center;
+      color: #97aec9;
+      background: #fafdff;
+      border-radius: 40px;
+      border: 1px dashed #d7e0eb;
+      font-size: 0.95rem;
+    }
+
+    .error {
+      text-align: center;
+      padding: 2rem;
+      color: #b91c1c;
+      background: #fef2f2;
+      border-radius: 30px;
+      border: 1px solid #fecaca;
+    }
+
+    /* адаптив */
+    @media (max-width: 768px) {
+      .card { padding: 1.5rem 1rem; }
+      .row-header, .row-item, .skeleton-header, .skeleton-row {
+        grid-template-columns: 45px 65px 55px 1fr 1fr 60px 55px;
+        gap: 0.2rem 0.3rem;
+        font-size: 0.7rem;
+        padding: 0.5rem 0.3rem;
+      }
+      .pair-num { width: 36px; font-size: 0.65rem; }
+      .pair-time { font-size: 0.6rem; }
+      .subgroup { font-size: 0.6rem; min-width: 20px; }
+      .auditorium { font-size: 0.6rem; min-width: 35px; padding: 0.05rem 0.3rem; }
+      .territory { font-size: 0.6rem; }
+      .head h1 { font-size: 1.4rem; }
+      .day-btn { padding: 0.25rem 1rem; font-size: 0.8rem; }
+      .skeleton-shimmer { height: 0.9rem; }
+    }
+
+    @media (max-width: 500px) {
+      .row-header, .row-item, .skeleton-header, .skeleton-row {
+        grid-template-columns: 32px 50px 40px 1fr 1fr 45px 42px;
+        gap: 0.1rem 0.2rem;
+        font-size: 0.6rem;
+        padding: 0.3rem 0.2rem;
+      }
+      .pair-num { width: 28px; font-size: 0.55rem; }
+      .pair-time { font-size: 0.5rem; }
+      .subgroup { font-size: 0.5rem; min-width: 16px; }
+      .auditorium { font-size: 0.5rem; min-width: 28px; padding: 0.05rem 0.2rem; }
+      .territory { font-size: 0.5rem; }
+      .head h1 { font-size: 1.2rem; }
+      .skeleton-shimmer { height: 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <div class="head">
+    <h1>📖 расписание <span>И-24-1</span></h1>
+  </div>
+
+  <div class="day-nav" id="dayNav">
+    <!-- скелетон для кнопок -->
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+      <div class="skeleton-shimmer" style="width:70px; height:2.2rem; border-radius:60px;"></div>
+      <div class="skeleton-shimmer" style="width:70px; height:2.2rem; border-radius:60px;"></div>
+      <div class="skeleton-shimmer" style="width:70px; height:2.2rem; border-radius:60px;"></div>
+    </div>
+    <span class="day-label" id="currentDateLabel"></span>
+  </div>
+
+  <div class="schedule" id="scheduleGrid">
+    <!-- скелетон для таблицы -->
+    <div class="skeleton" id="skeletonContainer">
+      <div class="skeleton-header">
+        <div class="skeleton-shimmer short"></div>
+        <div class="skeleton-shimmer medium"></div>
+        <div class="skeleton-shimmer short"></div>
+        <div class="skeleton-shimmer long"></div>
+        <div class="skeleton-shimmer long"></div>
+        <div class="skeleton-shimmer medium"></div>
+        <div class="skeleton-shimmer short"></div>
+      </div>
+      <div class="skeleton-row">
+        <div class="skeleton-shimmer short"></div>
+        <div class="skeleton-shimmer medium"></div>
+        <div class="skeleton-shimmer short"></div>
+        <div class="skeleton-shimmer long"></div>
+        <div class="skeleton-shimmer long"></div>
+        <div class="skeleton-shimmer medium"></div>
+        <div class="skeleton-shimmer short"></div>
+      </div>
+      <div class="skeleton-row">
+        <div class="skeleton-shimmer short"></div>
+        <div class="skeleton-shimmer medium"></div>
+        <div class="skeleton-shimmer short"></div>
+        <div class="skeleton-shimmer long"></div>
+        <div class="skeleton-shimmer long"></div>
+        <div class="skeleton-shimmer medium"></div>
+        <div class="skeleton-shimmer short"></div>
+      </div>
+      <div class="skeleton-row">
+        <div class="skeleton-shimmer short"></div>
+        <div class="skeleton-shimmer medium"></div>
+        <div class="skeleton-shimmer short"></div>
+        <div class="skeleton-shimmer long"></div>
+        <div class="skeleton-shimmer long"></div>
+        <div class="skeleton-shimmer medium"></div>
+        <div class="skeleton-shimmer short"></div>
+      </div>
+      <div class="skeleton-row">
+        <div class="skeleton-shimmer short"></div>
+        <div class="skeleton-shimmer medium"></div>
+        <div class="skeleton-shimmer short"></div>
+        <div class="skeleton-shimmer long"></div>
+        <div class="skeleton-shimmer long"></div>
+        <div class="skeleton-shimmer medium"></div>
+        <div class="skeleton-shimmer short"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    // ——— состояние ———
+    let scheduleData = [];
+    let currentDate = '';
+    let isLoading = true;
+
+    const dayNav = document.getElementById('dayNav');
+    const scheduleGrid = document.getElementById('scheduleGrid');
+    const currentDateLabel = document.getElementById('currentDateLabel');
+    const skeletonContainer = document.getElementById('skeletonContainer');
+
+    // ——— время пар ———
+    const pairTimes = {
+      1: '08:00–09:00',
+      2: '09:10–10:10',
+      3: '10:30–11:30',
+      4: '11:40–12:40',
+      5: '12:50–13:50'
+    };
+
+    // ——— формат даты ———
+    function formatDate(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    // ——— получить сегодняшнюю дату в формате YYYY-MM-DD ———
+    function getTodayStr() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // ——— группировка пар ———
+    function groupPairsByPair(pairs) {
+      const map = new Map();
+      pairs.forEach(item => {
+        const key = item.pair;
+        if (!map.has(key)) map.set(key, []);
+        map.get(key).push(item);
+      });
+      return map;
+    }
+
+    // ——— определение текущей пары (по времени) ———
+    function getCurrentPairNumber() {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const totalMinutes = hours * 60 + minutes;
+
+      const pairTimeRanges = [
+        { pair: 1, start: 8 * 60 + 0, end: 9 * 60 + 0 },
+        { pair: 2, start: 9 * 60 + 10, end: 10 * 60 + 10 },
+        { pair: 3, start: 10 * 60 + 30, end: 11 * 60 + 30 },
+        { pair: 4, start: 11 * 60 + 40, end: 12 * 60 + 40 },
+        { pair: 5, start: 12 * 60 + 50, end: 13 * 60 + 50 },
+      ];
+
+      for (const p of pairTimeRanges) {
+        if (totalMinutes >= p.start && totalMinutes < p.end) {
+          return p.pair;
+        }
+      }
+      return null;
+    }
+
+    // ——— рендер расписания с анимацией ———
+    function renderSchedule(dateStr) {
+      skeletonContainer.style.display = 'none';
+
+      if (!scheduleData.length) {
+        scheduleGrid.innerHTML = `<div class="empty-message">📭 нет данных</div>`;
+        return;
+      }
+
+      const dayData = scheduleData.find(item => item.date === dateStr);
+      if (!dayData || !dayData.pairs || dayData.pairs.length === 0) {
+        scheduleGrid.innerHTML = `<div class="empty-message">✕ на этот день пар нет</div>`;
+        return;
+      }
+
+      const today = getTodayStr();
+      const isToday = dateStr === today;
+      let currentPair = null;
+      if (isToday) {
+        currentPair = getCurrentPairNumber();
+      }
+
+      const grouped = groupPairsByPair(dayData.pairs);
+      const sortedKeys = Array.from(grouped.keys()).sort((a, b) => a - b);
+
+      let html = `
+        <div class="schedule-content">
+          <div class="row-header">
+            <span>Пара</span>
+            <span>Время</span>
+            <span>Подгр.</span>
+            <span>Дисциплина</span>
+            <span>Преподаватель</span>
+            <span>Аудитория</span>
+            <span>Территория</span>
+          </div>
+      `;
+
+      sortedKeys.forEach(pairNum => {
+        const items = grouped.get(pairNum);
+        const isCurrent = (currentPair === pairNum);
+        const rowClass = isCurrent ? 'row-item current-pair' : 'row-item';
+        const time = pairTimes[pairNum] || '—';
+
+        if (items.length > 1) {
+          const subgroups = items.map(it => it.subgroup).filter(s => s !== '');
+          const subgroupDisplay = subgroups.length > 0 ? subgroups.join(', ') : '—';
+          const disciplines = [...new Set(items.map(it => it.discipline))];
+          const teachers = [...new Set(items.map(it => it.teacher))];
+          const auditoriums = [...new Set(items.map(it => it.auditorium))];
+          const territories = [...new Set(items.map(it => it.territory))];
+
+          html += `
+            <div class="${rowClass}">
+              <span class="pair-num">${pairNum}</span>
+              <span class="pair-time">${time}</span>
+              <span class="subgroup">${subgroupDisplay}</span>
+              <span class="discipline">${disciplines.join(' / ')}</span>
+              <span class="teacher">${teachers.join(' / ')}</span>
+              <span class="auditorium">${auditoriums.join(' / ')}</span>
+              <span class="territory">${territories.join(' / ')}</span>
+            </div>
+          `;
+        } else {
+          const item = items[0];
+          const sub = item.subgroup || '';
+          const subDisplay = sub || '—';
+          html += `
+            <div class="${rowClass}">
+              <span class="pair-num">${item.pair}</span>
+              <span class="pair-time">${time}</span>
+              <span class="subgroup ${sub ? '' : 'empty'}">${subDisplay}</span>
+              <span class="discipline">${item.discipline}</span>
+              <span class="teacher">${item.teacher}</span>
+              <span class="auditorium">${item.auditorium}</span>
+              <span class="territory">${item.territory}</span>
+            </div>
+          `;
+        }
+      });
+
+      html += `</div>`;
+      scheduleGrid.innerHTML = html;
+    }
+
+    // ——— отрисовка кнопок ———
+    function renderDayButtons() {
+      if (!scheduleData.length) return;
+      const dates = scheduleData.map(item => item.date);
+
+      dayNav.innerHTML = '';
+
+      dates.forEach(dateStr => {
+        const btn = document.createElement('button');
+        const isActive = dateStr === currentDate;
+        btn.className = 'day-btn' + (isActive ? ' active' : '');
+        const d = new Date(dateStr + 'T00:00:00');
+        btn.textContent = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+        btn.dataset.date = dateStr;
+        btn.addEventListener('click', () => {
+          currentDate = dateStr;
+          renderDayButtons();
+          renderSchedule(currentDate);
+        });
+        dayNav.appendChild(btn);
+      });
+
+      const label = document.createElement('span');
+      label.className = 'day-label';
+      const found = scheduleData.find(item => item.date === currentDate);
+      label.textContent = found ? formatDate(currentDate) : '';
+      dayNav.appendChild(label);
+    }
+
+    // ——— загрузка JSON ———
+    function loadSchedule() {
+      const url = 'schedule.json';
+      fetch(url)
+        .then(response => {
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          return response.json();
+        })
+        .then(data => {
+          if (!Array.isArray(data) || data.length === 0) {
+            throw new Error('JSON должен содержать массив с расписанием');
+          }
+          scheduleData = data;
+
+          const today = getTodayStr();
+          const hasToday = scheduleData.some(d => d.date === today);
+
+          if (hasToday) {
+            currentDate = today;
+          } else {
+            currentDate = scheduleData[0]?.date || '';
+          }
+
+          renderDayButtons();
+          renderSchedule(currentDate);
+          isLoading = false;
+        })
+        .catch(error => {
+          console.error('Ошибка загрузки schedule.json:', error);
+          skeletonContainer.style.display = 'none';
+          scheduleGrid.innerHTML = `
+            <div class="error">
+              ⚠️ не удалось загрузить schedule.json<br>
+              <span style="font-size:0.8rem; color:#6b7280;">${error.message}</span>
+            </div>
+          `;
+          isLoading = false;
+        });
+    }
+
+    // ——— старт ———
+    loadSchedule();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+[
+  {
+    "date": "2026-09-01",
+    "group": "И-24-1",
+    "pairs": [
+      { "pair": 1, "subgroup": "1", "discipline": "Инструментальные средства разработки ПО", "teacher": "Сухомлинова М.В.", "auditorium": "каб. 203", "territory": "Корпус 1" },
+      { "pair": 1, "subgroup": "2", "discipline": "Инструментальные средства разработки ПО", "teacher": "Годованюк С.С.", "auditorium": "каб. 203", "territory": "Корпус 1" },
+      { "pair": 2, "subgroup": "", "discipline": "Физическая культура", "teacher": "Морозова В.Р.", "auditorium": "Спорт.зал", "territory": "Корпус 1" },
+      { "pair": 3, "subgroup": "", "discipline": "Основы финансовой грамотности", "teacher": "Маркевич Е.А.", "auditorium": "каб. 410", "territory": "Корпус 1" },
+      { "pair": 4, "subgroup": "", "discipline": "Инструментальные средства разработки ПО", "teacher": "Сухомлинова М.В.", "auditorium": "каб. 203", "territory": "Корпус 1" },
+      { "pair": 5, "subgroup": "", "discipline": "Математическое моделирование", "teacher": "Егорышева С.С.", "auditorium": "каб. 210", "territory": "Корпус 1" }
+    ]
+  },
+  {
+    "date": "2026-09-02",
+    "group": "И-24-1",
+    "pairs": [
+      { "pair": 2, "subgroup": "", "discipline": "Инструментальные средства разработки ПО", "teacher": "Сухомлинова М.В.", "auditorium": "каб. 203", "territory": "Корпус 1" },
+      { "pair": 3, "subgroup": "1", "discipline": "Технология разработки ПО", "teacher": "Бойко А.А.", "auditorium": "каб. 207", "territory": "Корпус 1" },
+      { "pair": 3, "subgroup": "2", "discipline": "Технология разработки ПО", "teacher": "Козлова М.С.", "auditorium": "каб. 213", "territory": "Корпус 1" }
+    ]
+  },
+  {
+    "date": "2026-09-03",
+    "group": "И-24-1",
+    "pairs": [
+      { "pair": 1, "subgroup": "1", "discipline": "Инструментальные средства разработки ПО", "teacher": "Сухомлинова М.В.", "auditorium": "каб. 203", "territory": "Корпус 1" },
+      { "pair": 1, "subgroup": "2", "discipline": "Инструментальные средства разработки ПО", "teacher": "Годованюк С.С.", "auditorium": "каб. 203", "territory": "Корпус 1" },
+      { "pair": 2, "subgroup": "1", "discipline": "Технология разработки ПО", "teacher": "Бойко А.А.", "auditorium": "каб. 207", "territory": "Корпус 1" },
+      { "pair": 2, "subgroup": "2", "discipline": "Технология разработки ПО", "teacher": "Козлова М.С.", "auditorium": "каб. 207", "territory": "Корпус 1" },
+      { "pair": 3, "subgroup": "1", "discipline": "Разработка мобильных приложений", "teacher": "Селедцова А.М.", "auditorium": "каб. 205", "territory": "Корпус 1" },
+      { "pair": 3, "subgroup": "2", "discipline": "Разработка мобильных приложений", "teacher": "Сухомлинова М.В.", "auditorium": "каб. 203", "territory": "Корпус 1" }
+    ]
+  }
+]

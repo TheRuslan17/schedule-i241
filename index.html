@@ -1,17 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
   <title>И-24-1 · расписание</title>
   <style>
-    /* ——— базовые стили ——— */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    /* ----- общие стили ----- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #f2f5f9;
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -21,13 +16,12 @@
       min-height: 100vh;
       padding: 0.8rem;
     }
-
     .card {
       max-width: 880px;
       width: 100%;
       background: #ffffff;
       border-radius: 28px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
       padding: 1.2rem 1.2rem;
       transition: 0.2s;
     }
@@ -38,12 +32,11 @@
       align-items: baseline;
       flex-wrap: wrap;
       justify-content: space-between;
-      margin-bottom: 1rem;
+      margin-bottom: 0.6rem;
       border-bottom: 1px solid #eef2f6;
-      padding-bottom: 0.9rem;
+      padding-bottom: 0.7rem;
       gap: 0.4rem;
     }
-
     .head h1 {
       font-weight: 500;
       font-size: 1.6rem;
@@ -54,22 +47,56 @@
       flex-wrap: wrap;
       gap: 0.2rem 0.5rem;
     }
-
-    .head h1 span {
-      font-weight: 350;
-      color: #4b5d73;
-      font-size: 1.1rem;
+    .head h1 span { font-weight: 350; color: #4b5d73; font-size: 1.1rem; }
+    .last-update {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      background: #f1f5f9;
+      padding: 0.15rem 0.7rem;
+      border-radius: 30px;
+      white-space: nowrap;
     }
+
+    /* вкладки */
+    .tabs {
+      display: flex;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #eef2f6;
+      padding-bottom: 0.5rem;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      padding: 0.4rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #64748b;
+      cursor: pointer;
+      border-radius: 40px;
+      transition: 0.15s;
+      touch-action: manipulation;
+    }
+    .tab-btn:hover { background: #f1f5f9; }
+    .tab-btn.active {
+      background: #1e2a3a;
+      color: white;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     /* навигация по дням */
     .day-nav {
       display: flex;
       flex-wrap: wrap;
       gap: 0.4rem 0.6rem;
-      margin-bottom: 1.2rem;
+      margin-bottom: 1rem;
       align-items: center;
+      touch-action: pan-y;
+      user-select: none;
     }
-
     .day-btn {
       background: white;
       border: 1px solid #e2e8f0;
@@ -84,39 +111,13 @@
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
+    .day-btn:active { transform: scale(0.96); }
+    .day-btn:hover { background: #f1f5fa; border-color: #c8d2e0; }
+    .day-btn.active { background: #1e2a3a; border-color: #1e2a3a; color: white; }
+    .day-label { font-size: 0.85rem; color: #4d637b; font-weight: 400; }
 
-    .day-btn:active {
-      transform: scale(0.96);
-    }
-
-    .day-btn:hover {
-      background: #f1f5fa;
-      border-color: #c8d2e0;
-    }
-
-    .day-btn.active {
-      background: #1e2a3a;
-      border-color: #1e2a3a;
-      color: white;
-    }
-
-    .day-label {
-      font-size: 0.85rem;
-      color: #4d637b;
-      font-weight: 400;
-    }
-
-    /* ——— скелетон ——— */
-    .skeleton {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .skeleton-header {
-      display: none;
-    }
-
+    /* скелетон */
+    .skeleton { display: flex; flex-direction: column; gap: 0.5rem; }
     .skeleton-row {
       display: grid;
       grid-template-columns: 50px 1fr 1fr;
@@ -127,7 +128,6 @@
       border: 1px solid #f0f4fa;
       align-items: center;
     }
-
     .skeleton-shimmer {
       height: 1rem;
       border-radius: 6px;
@@ -135,35 +135,22 @@
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
     }
-
     .skeleton-shimmer.short { width: 40px; }
     .skeleton-shimmer.medium { width: 60px; }
     .skeleton-shimmer.long { width: 100%; }
-
     @keyframes shimmer {
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
 
-    /* ——— АНИМАЦИЯ ——— */
-    .schedule-content {
-      animation: slideFadeIn 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-    }
-
+    .schedule-content { animation: slideFadeIn 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); }
     @keyframes slideFadeIn {
       0% { opacity: 0; transform: translateY(8px); }
       100% { opacity: 1; transform: translateY(0); }
     }
 
-    /* ============================================
-       ТАБЛИЦА ДЛЯ ПК (широкие экраны)
-    ============================================ */
-    .schedule-table {
-      display: none;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-
+    /* ===== ТАБЛИЦА ДЛЯ ПК ===== */
+    .schedule-table { display: none; flex-direction: column; gap: 0.4rem; }
     .schedule-table .row-header {
       display: grid;
       grid-template-columns: 50px 90px 60px 1fr 1.1fr 80px 70px;
@@ -178,11 +165,7 @@
       border-radius: 16px;
       font-weight: 500;
     }
-
-    .schedule-table .row-header span:last-child {
-      text-align: right;
-    }
-
+    .schedule-table .row-header span:last-child { text-align: right; }
     .schedule-table .row-item {
       display: grid;
       grid-template-columns: 50px 90px 60px 1fr 1.1fr 80px 70px;
@@ -196,17 +179,79 @@
       font-size: 0.88rem;
       line-height: 1.3;
     }
-
-    .schedule-table .row-item:hover {
-      background: #f8faff;
-      border-color: #dce4ef;
-    }
-
+    .schedule-table .row-item:hover { background: #f8faff; border-color: #dce4ef; }
     .schedule-table .row-item.current-pair {
       border-color: #4a7aff;
-      background: rgba(74, 122, 255, 0.08);
-      box-shadow: 0 0 0 2px rgba(74, 122, 255, 0.12);
+      background: rgba(74,122,255,0.08);
+      box-shadow: 0 0 0 2px rgba(74,122,255,0.12);
     }
+
+    /* ===== КАРТОЧКИ ДЛЯ ТЕЛЕФОНА ===== */
+    .schedule-cards { display: flex; flex-direction: column; gap: 0.5rem; }
+    .schedule-cards .card-item {
+      background: white;
+      border: 1px solid #f0f4fa;
+      border-radius: 16px;
+      padding: 0.7rem 0.8rem;
+      transition: 0.08s;
+    }
+    .schedule-cards .card-item.current-pair {
+      border-color: #4a7aff;
+      background: rgba(74,122,255,0.06);
+      box-shadow: 0 0 0 2px rgba(74,122,255,0.1);
+    }
+    .schedule-cards .card-top {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.3rem;
+    }
+    .schedule-cards .card-pair {
+      font-weight: 600;
+      color: #142433;
+      background: #f0f4fc;
+      border-radius: 40px;
+      padding: 0.05rem 0.6rem;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+    .schedule-cards .card-time {
+      font-size: 0.7rem;
+      color: #4d637b;
+      font-weight: 450;
+    }
+    .schedule-cards .card-subgroup {
+      font-size: 0.65rem;
+      background: #eef3fa;
+      border-radius: 30px;
+      padding: 0.05rem 0.5rem;
+      color: #2e405b;
+      font-weight: 450;
+    }
+    .schedule-cards .card-subgroup.empty { background: transparent; color: #a5b7cd; }
+    .schedule-cards .card-discipline {
+      font-weight: 500;
+      color: #0a1c2e;
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+    }
+    .schedule-cards .card-teacher { color: #1b3147; font-size: 0.8rem; }
+    .schedule-cards .card-bottom {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.3rem;
+    }
+    .schedule-cards .card-auditorium {
+      background: #eef3fa;
+      padding: 0.05rem 0.5rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      color: #1f364d;
+      font-weight: 450;
+    }
+    .schedule-cards .card-territory { font-size: 0.7rem; color: #4a637e; }
 
     .pair-num {
       font-weight: 480;
@@ -218,15 +263,7 @@
       font-size: 0.8rem;
       width: 40px;
     }
-
-    .pair-time {
-      font-size: 0.7rem;
-      color: #4d637b;
-      text-align: center;
-      font-weight: 450;
-      white-space: nowrap;
-    }
-
+    .pair-time { font-size: 0.7rem; color: #4d637b; text-align: center; font-weight: 450; white-space: nowrap; }
     .subgroup {
       font-size: 0.7rem;
       background: #eef3fa;
@@ -237,23 +274,9 @@
       font-weight: 450;
       min-width: 30px;
     }
-
-    .subgroup.empty {
-      background: transparent;
-      color: #a5b7cd;
-    }
-
-    .discipline {
-      font-weight: 470;
-      color: #0a1c2e;
-      word-break: break-word;
-    }
-
-    .teacher {
-      color: #1b3147;
-      font-size: 0.85rem;
-    }
-
+    .subgroup.empty { background: transparent; color: #a5b7cd; }
+    .discipline { font-weight: 470; color: #0a1c2e; word-break: break-word; }
+    .teacher { color: #1b3147; font-size: 0.85rem; }
     .auditorium {
       background: #eef3fa;
       padding: 0.1rem 0.5rem;
@@ -265,193 +288,32 @@
       min-width: 50px;
       font-weight: 450;
     }
+    .territory { font-size: 0.7rem; color: #4a637e; text-align: right; white-space: nowrap; }
 
-    .territory {
-      font-size: 0.7rem;
-      color: #4a637e;
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    /* ============================================
-       КАРТОЧКИ ДЛЯ ТЕЛЕФОНА
-    ============================================ */
-    .schedule-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .schedule-cards .card-item {
-      background: white;
-      border: 1px solid #f0f4fa;
-      border-radius: 16px;
-      padding: 0.7rem 0.8rem;
-      transition: 0.08s;
-    }
-
-    .schedule-cards .card-item.current-pair {
-      border-color: #4a7aff;
-      background: rgba(74, 122, 255, 0.06);
-      box-shadow: 0 0 0 2px rgba(74, 122, 255, 0.1);
-    }
-
-    .schedule-cards .card-top {
-      display: flex;
-      align-items: baseline;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 0.3rem;
-    }
-
-    .schedule-cards .card-pair {
+    .subbotnik-badge {
+      display: inline-block;
+      background: #f39c12;
+      color: white;
+      font-size: 0.55rem;
       font-weight: 600;
-      color: #142433;
-      background: #f0f4fc;
+      padding: 0.1rem 0.5rem;
       border-radius: 40px;
-      padding: 0.05rem 0.6rem;
-      font-size: 0.8rem;
-      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-left: 0.3rem;
     }
-
-    .schedule-cards .card-time {
-      font-size: 0.7rem;
-      color: #4d637b;
-      font-weight: 450;
+    .subbotnik-info {
+      background: #fef9e7;
+      border-left: 4px solid #f39c12;
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: #2c3e50;
+      line-height: 1.5;
     }
-
-    .schedule-cards .card-subgroup {
-      font-size: 0.65rem;
-      background: #eef3fa;
-      border-radius: 30px;
-      padding: 0.05rem 0.5rem;
-      color: #2e405b;
-      font-weight: 450;
-    }
-
-    .schedule-cards .card-subgroup.empty {
-      background: transparent;
-      color: #a5b7cd;
-    }
-
-    .schedule-cards .card-discipline {
-      font-weight: 500;
-      color: #0a1c2e;
-      font-size: 0.95rem;
-      margin-bottom: 0.2rem;
-    }
-
-    .schedule-cards .card-teacher {
-      color: #1b3147;
-      font-size: 0.8rem;
-    }
-
-    .schedule-cards .card-bottom {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-top: 0.3rem;
-    }
-
-    .schedule-cards .card-auditorium {
-      background: #eef3fa;
-      padding: 0.05rem 0.5rem;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      color: #1f364d;
-      font-weight: 450;
-    }
-
-    .schedule-cards .card-territory {
-      font-size: 0.7rem;
-      color: #4a637e;
-    }
-
-    /* ============================================
-       АДАПТИВНОСТЬ
-    ============================================ */
-
-    /* ПК — показываем таблицу */
-    @media (min-width: 769px) {
-      .schedule-table {
-        display: flex;
-      }
-      .schedule-cards {
-        display: none;
-      }
-      .card {
-        padding: 1.5rem 1.8rem;
-      }
-      .head h1 {
-        font-size: 1.9rem;
-      }
-      .head h1 span {
-        font-size: 1.2rem;
-      }
-    }
-
-    /* Телефон — показываем карточки */
-    @media (max-width: 768px) {
-      .schedule-table {
-        display: none;
-      }
-      .schedule-cards {
-        display: flex;
-      }
-      .card {
-        padding: 0.8rem 0.8rem;
-        border-radius: 20px;
-      }
-      .head h1 {
-        font-size: 1.3rem;
-      }
-      .head h1 span {
-        font-size: 0.9rem;
-      }
-      .day-btn {
-        padding: 0.25rem 0.9rem;
-        font-size: 0.75rem;
-      }
-      .day-label {
-        font-size: 0.75rem;
-      }
-    }
-
-    @media (max-width: 420px) {
-      .card {
-        padding: 0.5rem 0.5rem;
-        border-radius: 16px;
-      }
-      .head h1 {
-        font-size: 1.1rem;
-      }
-      .head h1 span {
-        font-size: 0.8rem;
-      }
-      .day-btn {
-        padding: 0.2rem 0.7rem;
-        font-size: 0.65rem;
-      }
-      .day-label {
-        font-size: 0.65rem;
-      }
-      .schedule-cards .card-item {
-        padding: 0.5rem 0.6rem;
-      }
-      .schedule-cards .card-discipline {
-        font-size: 0.85rem;
-      }
-      .schedule-cards .card-teacher {
-        font-size: 0.7rem;
-      }
-      .schedule-cards .card-pair {
-        font-size: 0.7rem;
-        padding: 0.05rem 0.5rem;
-      }
-      .schedule-cards .card-time {
-        font-size: 0.6rem;
-      }
-    }
+    .subbotnik-info strong { color: #e67e22; }
+    .subbotnik-info .time { font-weight: 600; color: #c0392b; }
 
     .empty-message {
       padding: 2rem 0.5rem;
@@ -462,7 +324,6 @@
       border: 1px dashed #d7e0eb;
       font-size: 0.9rem;
     }
-
     .error {
       text-align: center;
       padding: 1.5rem;
@@ -472,6 +333,135 @@
       border: 1px solid #fecaca;
       font-size: 0.85rem;
     }
+
+    /* ===== РАСПИСАНИЕ ЗВОНКОВ ===== */
+    .ring-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .ring-table th, .ring-table td {
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid #eef2f6;
+    }
+    .ring-table th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .ring-table tr:hover { background: #f8fafc; }
+    .ring-table .pair-num-ring {
+      font-weight: 600;
+      color: #1e293b;
+      background: #f1f5f9;
+      border-radius: 40px;
+      padding: 0.1rem 0.6rem;
+      display: inline-block;
+      font-size: 0.8rem;
+    }
+    .ring-table .time-ring { color: #334155; font-weight: 500; }
+    .ring-table .break-ring { color: #64748b; font-size: 0.8rem; }
+
+    /* ===== ПРЕПОДАВАТЕЛИ (КРУПНЫЕ ФОТО) ===== */
+    .teacher-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.2rem;
+    }
+    .teacher-card {
+      background: white;
+      border: 1px solid #f0f4fa;
+      border-radius: 20px;
+      padding: 1.2rem 1rem;
+      transition: 0.08s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.6rem;
+    }
+    .teacher-card:hover { background: #f8faff; border-color: #dce4ef; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+    .teacher-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: #eef2f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 3px solid #eef2f6;
+    }
+    .teacher-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .teacher-avatar .no-photo {
+      font-size: 1.8rem;
+      color: #94a3b8;
+    }
+    .teacher-name {
+      font-weight: 500;
+      color: #0b1a2a;
+      font-size: 0.95rem;
+      line-height: 1.3;
+    }
+
+    /* адаптив */
+    @media (min-width: 769px) {
+      .schedule-table { display: flex; }
+      .schedule-cards { display: none; }
+      .card { padding: 1.5rem 1.8rem; }
+      .head h1 { font-size: 1.9rem; }
+      .head h1 span { font-size: 1.2rem; }
+      .teacher-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    }
+    @media (max-width: 768px) {
+      .schedule-table { display: none; }
+      .schedule-cards { display: flex; }
+      .card { padding: 0.8rem 0.8rem; border-radius: 20px; }
+      .head h1 { font-size: 1.3rem; }
+      .head h1 span { font-size: 0.9rem; }
+      .day-btn { padding: 0.25rem 0.9rem; font-size: 0.75rem; }
+      .day-label { font-size: 0.75rem; }
+      .teacher-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+      .teacher-avatar { width: 80px; height: 80px; font-size: 1.8rem; }
+    }
+    @media (max-width: 420px) {
+      .card { padding: 0.5rem 0.5rem; border-radius: 16px; }
+      .head h1 { font-size: 1.1rem; }
+      .head h1 span { font-size: 0.8rem; }
+      .day-btn { padding: 0.2rem 0.7rem; font-size: 0.65rem; }
+      .day-label { font-size: 0.65rem; }
+      .schedule-cards .card-item { padding: 0.5rem 0.6rem; }
+      .schedule-cards .card-discipline { font-size: 0.85rem; }
+      .schedule-cards .card-teacher { font-size: 0.7rem; }
+      .schedule-cards .card-pair { font-size: 0.7rem; padding: 0.05rem 0.5rem; }
+      .schedule-cards .card-time { font-size: 0.6rem; }
+      .subbotnik-info { font-size: 0.75rem; padding: 0.6rem 0.7rem; }
+      .teacher-grid { grid-template-columns: 1fr 1fr; }
+      .teacher-avatar { width: 70px; height: 70px; font-size: 1.5rem; }
+      .ring-table { font-size: 0.75rem; }
+      .ring-table th, .ring-table td { padding: 0.4rem 0.4rem; }
+    }
+
+    /* иконки для дисциплин — анимированные */
+    .discipline-icon {
+      display: inline-block;
+      margin-right: 0.3rem;
+      animation: iconPulse 2s ease-in-out infinite;
+    }
+    @keyframes iconPulse {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.1) rotate(5deg); }
+    }
   </style>
 </head>
 <body>
@@ -479,45 +469,61 @@
 
   <div class="head">
     <h1>📖 расписание <span>И-24-1</span></h1>
+    <span class="last-update" id="lastUpdate">🔄 загрузка...</span>
   </div>
 
-  <div class="day-nav" id="dayNav">
-    <div style="display:flex; gap:0.3rem 0.5rem; flex-wrap:wrap;">
-      <div class="skeleton-shimmer" style="width:60px; height:2rem; border-radius:60px;"></div>
-      <div class="skeleton-shimmer" style="width:60px; height:2rem; border-radius:60px;"></div>
-      <div class="skeleton-shimmer" style="width:60px; height:2rem; border-radius:60px;"></div>
+  <!-- ВКЛАДКИ -->
+  <div class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="schedule">📅 Расписание</button>
+    <button class="tab-btn" data-tab="rings">🔔 Звонки</button>
+    <button class="tab-btn" data-tab="teachers">👨‍🏫 Преподаватели</button>
+  </div>
+
+  <!-- Вкладка: РАСПИСАНИЕ -->
+  <div class="tab-content active" id="tab-schedule">
+    <div class="day-nav" id="dayNav">
+      <div style="display:flex; gap:0.3rem 0.5rem; flex-wrap:wrap;">
+        <div class="skeleton-shimmer" style="width:60px; height:2rem; border-radius:60px;"></div>
+        <div class="skeleton-shimmer" style="width:60px; height:2rem; border-radius:60px;"></div>
+        <div class="skeleton-shimmer" style="width:60px; height:2rem; border-radius:60px;"></div>
+      </div>
+      <span class="day-label" id="currentDateLabel"></span>
     </div>
-    <span class="day-label" id="currentDateLabel"></span>
+    <div id="scheduleContainer">
+      <div class="skeleton" id="skeletonContainer">
+        <div class="skeleton-row"><div class="skeleton-shimmer short"></div><div class="skeleton-shimmer long"></div><div class="skeleton-shimmer medium"></div></div>
+        <div class="skeleton-row"><div class="skeleton-shimmer short"></div><div class="skeleton-shimmer long"></div><div class="skeleton-shimmer medium"></div></div>
+        <div class="skeleton-row"><div class="skeleton-shimmer short"></div><div class="skeleton-shimmer long"></div><div class="skeleton-shimmer medium"></div></div>
+        <div class="skeleton-row"><div class="skeleton-shimmer short"></div><div class="skeleton-shimmer long"></div><div class="skeleton-shimmer medium"></div></div>
+        <div class="skeleton-row"><div class="skeleton-shimmer short"></div><div class="skeleton-shimmer long"></div><div class="skeleton-shimmer medium"></div></div>
+      </div>
+    </div>
   </div>
 
-  <div id="scheduleContainer">
-    <!-- скелетон -->
-    <div class="skeleton" id="skeletonContainer">
-      <div class="skeleton-row">
-        <div class="skeleton-shimmer short"></div>
-        <div class="skeleton-shimmer long"></div>
-        <div class="skeleton-shimmer medium"></div>
-      </div>
-      <div class="skeleton-row">
-        <div class="skeleton-shimmer short"></div>
-        <div class="skeleton-shimmer long"></div>
-        <div class="skeleton-shimmer medium"></div>
-      </div>
-      <div class="skeleton-row">
-        <div class="skeleton-shimmer short"></div>
-        <div class="skeleton-shimmer long"></div>
-        <div class="skeleton-shimmer medium"></div>
-      </div>
-      <div class="skeleton-row">
-        <div class="skeleton-shimmer short"></div>
-        <div class="skeleton-shimmer long"></div>
-        <div class="skeleton-shimmer medium"></div>
-      </div>
-      <div class="skeleton-row">
-        <div class="skeleton-shimmer short"></div>
-        <div class="skeleton-shimmer long"></div>
-        <div class="skeleton-shimmer medium"></div>
-      </div>
+  <!-- Вкладка: ЗВОНКИ -->
+  <div class="tab-content" id="tab-rings">
+    <div style="margin-bottom:1rem;">
+      <h3 style="font-weight:500; color:#0b1a2a; font-size:1.1rem;">🔔 Расписание звонков</h3>
+      <p style="font-size:0.8rem; color:#64748b;">Занятия проходят по лентам (парам)</p>
+    </div>
+    <table class="ring-table" id="ringTable">
+      <thead>
+        <tr><th>Пара</th><th>Время</th><th>Перемена</th></tr>
+      </thead>
+      <tbody id="ringBody">
+        <!-- заполняется из JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Вкладка: ПРЕПОДАВАТЕЛИ -->
+  <div class="tab-content" id="tab-teachers">
+    <div style="margin-bottom:1rem;">
+      <h3 style="font-weight:500; color:#0b1a2a; font-size:1.1rem;">👨‍🏫 Все преподаватели</h3>
+      <p style="font-size:0.8rem; color:#64748b;">Преподаватели, ведущие занятия в группе</p>
+    </div>
+    <div class="teacher-grid" id="teacherGrid">
+      <!-- заполняется из JS -->
     </div>
   </div>
 
@@ -525,23 +531,150 @@
 
 <script>
   (function() {
+    // ----- ДАННЫЕ -----
     let scheduleData = [];
     let currentDate = '';
+    let currentTab = 'schedule';
 
-    const dayNav = document.getElementById('dayNav');
-    const scheduleContainer = document.getElementById('scheduleContainer');
-    const currentDateLabel = document.getElementById('currentDateLabel');
-    const skeletonContainer = document.getElementById('skeletonContainer');
-
-    // === ИСПРАВЛЕННОЕ ВРЕМЯ ПАР ===
+    // Время пар
     const pairTimes = {
       1: '08:00–09:30',
       2: '09:50–11:20',
       3: '11:50–13:20',
-      4: '13:40–15:00',
+      4: '13:30–15:00',
       5: '15:10–16:40'
     };
 
+    // --- СОКРАЩЕНИЯ ДЛЯ ПРЕПОДАВАТЕЛЕЙ В РАСПИСАНИИ ---
+    const shortNames = {
+      'Сухомлинова Мария Викторовна': 'Сухомлинова М.В.',
+      'Годованюк Сергей Сергеевич': 'Годованюк С.С.',
+      'Бойко Анна Александровна': 'Бойко А.А.',
+      'Козлова Марина Сергеевна': 'Козлова М.С.',
+      'Селедцова Анжелика Михайловна': 'Селедцова А.М.',
+      'Морозова Валентина Рашидовна': 'Морозова В.Р.',
+      'Егорышева София Сергеевна': 'Егорышева С.С.',
+      'Маркевич Елена Александровна': 'Маркевич Е.А.'
+    };
+
+    function getShortName(fullName) {
+      return shortNames[fullName] || fullName;
+    }
+
+    // Список преподавателей с фото (полные ФИО)
+    const teachersList = [
+      { name: 'Сухомлинова Мария Викторовна', photo: 'p1.png' },
+      { name: 'Годованюк Сергей Сергеевич', photo: 'p2.png' },
+      { name: 'Бойко Анна Александровна', photo: 'p3.png' },
+      { name: 'Козлова Марина Сергеевна', photo: 'p4.png' },
+      { name: 'Селедцова Анжелика Михайловна', photo: 'p5.png' },
+      { name: 'Морозова Валентина Рашидовна', photo: 'p6.png' },
+      { name: 'Егорышева София Сергеевна', photo: 'p7.png' },
+      { name: 'Маркевич Елена Александровна', photo: 'p8.png' }
+    ];
+
+    const teacherPhotoMap = {};
+    teachersList.forEach(t => {
+      teacherPhotoMap[t.name] = t.photo;
+    });
+
+    // Иконки для дисциплин
+    const disciplineIcons = {
+      'инструментальные': '🛠️',
+      'физическая культура': '🏃',
+      'основы финансовой грамотности': '💰',
+      'финансовой': '💰',
+      'математическое моделирование': '📐',
+      'технология разработки': '💻',
+      'разработка мобильных': '📱',
+      'мобильных': '📱',
+      'субботник': '🧹'
+    };
+
+    function getIconForDiscipline(name) {
+      const lower = name.toLowerCase();
+      for (const [key, icon] of Object.entries(disciplineIcons)) {
+        if (lower.includes(key)) return icon;
+      }
+      return '📘';
+    }
+
+    // ----- DOM -----
+    const dayNav = document.getElementById('dayNav');
+    const scheduleContainer = document.getElementById('scheduleContainer');
+    const currentDateLabel = document.getElementById('currentDateLabel');
+    const skeletonContainer = document.getElementById('skeletonContainer');
+    const lastUpdateEl = document.getElementById('lastUpdate');
+    const ringBody = document.getElementById('ringBody');
+    const teacherGrid = document.getElementById('teacherGrid');
+
+    // ----- ВКЛАДКИ -----
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        currentTab = tab;
+        if (tab === 'teachers') renderTeachers();
+        if (tab === 'rings') renderRings();
+      });
+    });
+
+    // ----- РАСПИСАНИЕ ЗВОНКОВ -----
+    function renderRings() {
+      const rows = [
+        { pair: 1, start: '08:00', end: '09:30', breakTime: '20 мин' },
+        { pair: 2, start: '09:50', end: '11:20', breakTime: '30 мин' },
+        { pair: 3, start: '11:50', end: '13:20', breakTime: '10 мин' },
+        { pair: 4, start: '13:30', end: '15:00', breakTime: '10 мин' },
+        { pair: 5, start: '15:10', end: '16:40', breakTime: '—' }
+      ];
+      ringBody.innerHTML = rows.map((r, i) => `
+        <tr>
+          <td><span class="pair-num-ring">${r.pair}</span></td>
+          <td class="time-ring">${r.start} – ${r.end}</td>
+          <td class="break-ring">${i < rows.length - 1 ? rows[i + 1].start + ' (' + r.breakTime + ')' : '—'}</td>
+        </tr>
+      `).join('');
+    }
+
+    // ----- ПРЕПОДАВАТЕЛИ (только ФИО и фото) -----
+    function renderTeachers() {
+      // Сортируем по списку teachersList
+      const sorted = teachersList.filter(t => {
+        // проверяем, есть ли этот преподаватель в расписании
+        let found = false;
+        scheduleData.forEach(day => {
+          day.pairs.forEach(p => {
+            if (p.teacher === t.name) found = true;
+          });
+        });
+        return found;
+      });
+
+      if (!sorted.length) {
+        teacherGrid.innerHTML = '<div class="empty-message">Преподаватели не найдены</div>';
+        return;
+      }
+
+      teacherGrid.innerHTML = sorted.map(t => {
+        const photoPath = t.photo;
+        const initials = t.name.split(' ').map(w => w[0]).join('').slice(0, 2);
+        return `
+          <div class="teacher-card">
+            <div class="teacher-avatar">
+              ${photoPath ? `<img src="${photoPath}" alt="${t.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` : ''}
+              <span class="no-photo" style="${photoPath ? 'display:none;' : ''}">${initials}</span>
+            </div>
+            <div class="teacher-name">${t.name}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ----- ОБЩИЕ ФУНКЦИИ -----
     function formatDate(dateStr) {
       const d = new Date(dateStr + 'T00:00:00');
       return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -572,7 +705,7 @@
         { pair: 1, start: 8 * 60, end: 9 * 60 + 30 },
         { pair: 2, start: 9 * 60 + 50, end: 11 * 60 + 20 },
         { pair: 3, start: 11 * 60 + 50, end: 13 * 60 + 20 },
-        { pair: 4, start: 13 * 60 + 40, end: 15 * 60 },
+        { pair: 4, start: 13 * 60 + 30, end: 15 * 60 },
         { pair: 5, start: 15 * 60 + 10, end: 16 * 60 + 40 },
       ];
       for (const p of ranges) {
@@ -581,6 +714,42 @@
       return null;
     }
 
+    function isSubbotnik(discipline) {
+      return discipline && discipline.toLowerCase().includes('субботник');
+    }
+
+    // ----- СВАЙП -----
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    function getDates() {
+      return scheduleData.map(item => item.date);
+    }
+
+    function getPrevDate() {
+      const dates = getDates();
+      const idx = dates.indexOf(currentDate);
+      return idx > 0 ? dates[idx - 1] : null;
+    }
+
+    function getNextDate() {
+      const dates = getDates();
+      const idx = dates.indexOf(currentDate);
+      return idx < dates.length - 1 ? dates[idx + 1] : null;
+    }
+
+    function handleSwipe(direction) {
+      let newDate = null;
+      if (direction === 'left') newDate = getNextDate();
+      else if (direction === 'right') newDate = getPrevDate();
+      if (newDate) {
+        currentDate = newDate;
+        renderDayButtons();
+        renderSchedule(currentDate);
+      }
+    }
+
+    // ----- ОТРИСОВКА РАСПИСАНИЯ -----
     function renderSchedule(dateStr) {
       skeletonContainer.style.display = 'none';
 
@@ -602,38 +771,55 @@
       const grouped = groupPairsByPair(dayData.pairs);
       const sortedKeys = Array.from(grouped.keys()).sort((a, b) => a - b);
 
-      // ——— ТАБЛИЦА ДЛЯ ПК ———
-      let tableHtml = `<div class="schedule-table schedule-content">
+      const hasSubbotnik = dayData.pairs.some(p => isSubbotnik(p.discipline));
+
+      let subbotnikHtml = '';
+      if (hasSubbotnik) {
+        subbotnikHtml = `
+          <div class="subbotnik-info">
+            <strong>🧹 СУББОТНИК!</strong><br>
+            Сбор у колледжа в <span class="time">8:30</span><br>
+            После завершения работ — занятия на самостоятельное изучение.<br>
+            <span style="font-size:0.8rem; color:#7f8c8d;">Не забудьте взять инвентарь: веники, перчатки, пакеты</span>
+          </div>
+        `;
+      }
+
+      // ТАБЛИЦА
+      let tableHtml = `<div class="schedule-table schedule-content">${subbotnikHtml}
         <div class="row-header">
           <span>Пара</span><span>Время</span><span>Подгр.</span>
           <span>Дисциплина</span><span>Преподаватель</span>
           <span>Аудитория</span><span>Территория</span>
         </div>`;
 
-      // ——— КАРТОЧКИ ДЛЯ ТЕЛЕФОНА ———
-      let cardsHtml = `<div class="schedule-cards schedule-content">`;
+      // КАРТОЧКИ
+      let cardsHtml = `<div class="schedule-cards schedule-content">${subbotnikHtml}`;
 
       sortedKeys.forEach(pairNum => {
         const items = grouped.get(pairNum);
         const isCurrent = (currentPair === pairNum);
         const rowClass = isCurrent ? 'row-item current-pair' : 'row-item';
-        const cardClass = isCurrent ? 'card-item current-pair' : 'card-item';
         const time = pairTimes[pairNum] || '—';
+        const isSubb = items.some(it => isSubbotnik(it.discipline));
+
+        let cardClass = isCurrent ? 'card-item current-pair' : 'card-item';
 
         if (items.length > 1) {
           const subgroups = items.map(it => it.subgroup).filter(s => s !== '');
           const subgroupDisplay = subgroups.length > 0 ? subgroups.join(', ') : '—';
           const disciplines = [...new Set(items.map(it => it.discipline))];
-          const teachers = [...new Set(items.map(it => it.teacher))];
+          const teachers = [...new Set(items.map(it => getShortName(it.teacher)))];
           const auditoriums = [...new Set(items.map(it => it.auditorium))];
           const territories = [...new Set(items.map(it => it.territory))];
+          const icon = getIconForDiscipline(disciplines[0] || '');
 
           tableHtml += `
             <div class="${rowClass}">
               <span class="pair-num">${pairNum}</span>
               <span class="pair-time">${time}</span>
               <span class="subgroup">${subgroupDisplay}</span>
-              <span class="discipline">${disciplines.join(' / ')}</span>
+              <span class="discipline"><span class="discipline-icon">${icon}</span>${disciplines.join(' / ')}</span>
               <span class="teacher">${teachers.join(' / ')}</span>
               <span class="auditorium">${auditoriums.join(' / ')}</span>
               <span class="territory">${territories.join(' / ')}</span>
@@ -646,7 +832,7 @@
                 <span class="card-time">${time}</span>
                 <span class="card-subgroup">${subgroupDisplay}</span>
               </div>
-              <div class="card-discipline">${disciplines.join(' / ')}</div>
+              <div class="card-discipline"><span class="discipline-icon">${icon}</span>${disciplines.join(' / ')}</div>
               <div class="card-teacher">${teachers.join(' / ')}</div>
               <div class="card-bottom">
                 <span class="card-auditorium">${auditoriums.join(' / ')}</span>
@@ -658,14 +844,16 @@
           const item = items[0];
           const sub = item.subgroup || '';
           const subDisplay = sub || '—';
+          const icon = getIconForDiscipline(item.discipline);
+          const shortTeacher = getShortName(item.teacher);
 
           tableHtml += `
             <div class="${rowClass}">
               <span class="pair-num">${item.pair}</span>
               <span class="pair-time">${time}</span>
               <span class="subgroup ${sub ? '' : 'empty'}">${subDisplay}</span>
-              <span class="discipline">${item.discipline}</span>
-              <span class="teacher">${item.teacher}</span>
+              <span class="discipline"><span class="discipline-icon">${icon}</span>${item.discipline}</span>
+              <span class="teacher">${shortTeacher}</span>
               <span class="auditorium">${item.auditorium}</span>
               <span class="territory">${item.territory}</span>
             </div>`;
@@ -677,8 +865,8 @@
                 <span class="card-time">${time}</span>
                 <span class="card-subgroup ${sub ? '' : 'empty'}">${subDisplay}</span>
               </div>
-              <div class="card-discipline">${item.discipline}</div>
-              <div class="card-teacher">${item.teacher}</div>
+              <div class="card-discipline"><span class="discipline-icon">${icon}</span>${item.discipline}</div>
+              <div class="card-teacher">${shortTeacher}</div>
               <div class="card-bottom">
                 <span class="card-auditorium">${item.auditorium}</span>
                 <span class="card-territory">${item.territory}</span>
@@ -693,6 +881,7 @@
       scheduleContainer.innerHTML = tableHtml + cardsHtml;
     }
 
+    // ----- КНОПКИ ДНЕЙ -----
     function renderDayButtons() {
       if (!scheduleData.length) return;
       const dates = scheduleData.map(item => item.date);
@@ -721,6 +910,7 @@
       dayNav.appendChild(label);
     }
 
+    // ----- ЗАГРУЗКА JSON -----
     function loadSchedule() {
       fetch('schedule.json')
         .then(response => {
@@ -736,6 +926,11 @@
           currentDate = scheduleData.some(d => d.date === today) ? today : scheduleData[0]?.date || '';
           renderDayButtons();
           renderSchedule(currentDate);
+          renderRings();
+          renderTeachers();
+
+          const now = new Date();
+          lastUpdateEl.textContent = `🔄 обновлено ${now.toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' })}`;
         })
         .catch(error => {
           console.error('Ошибка:', error);
@@ -746,7 +941,29 @@
         });
     }
 
+    // ----- СВАЙП -----
+    function initSwipe() {
+      const el = document.querySelector('.card');
+      if (!el) return;
+      el.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+      }, { passive: true });
+
+      el.addEventListener('touchend', (e) => {
+        if (!touchStartX) return;
+        const diffX = e.changedTouches[0].screenX - touchStartX;
+        const diffY = e.changedTouches[0].screenY - touchStartY;
+        if (Math.abs(diffX) < 40 || Math.abs(diffX) < Math.abs(diffY) * 0.6) return;
+        if (diffX < 0) handleSwipe('left');
+        else handleSwipe('right');
+        touchStartX = 0;
+      }, { passive: true });
+    }
+
+    // ----- СТАРТ -----
     loadSchedule();
+    initSwipe();
   })();
 </script>
 </body>
